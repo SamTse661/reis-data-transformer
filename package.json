@@ -1,0 +1,40 @@
+{
+  "name": "reis-data-transformer",
+  "version": "0.0.1",
+  "description": "Data Transformer for REIS",
+  "main": "index.js",
+  "scripts": {
+    "start": "babel-node src",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SamTse661/reis-data-transformer.git"
+  },
+  "author": "Sam Tse (HKMCI)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SamTse661/reis-data-transformer/issues"
+  },
+  "homepage": "https://github.com/SamTse661/reis-data-transformer#readme",
+  "dependencies": {
+    "@babel/runtime": "^7.27.6",
+    "dotenv": "^16.5.0",
+    "uuid": "^11.1.0",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.27.2",
+    "@babel/core": "^7.27.4",
+    "@babel/node": "^7.27.1",
+    "@babel/plugin-transform-runtime": "^7.27.4",
+    "@babel/preset-env": "^7.27.2",
+    "eslint": "^8.37.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.7.0",
+    "eslint-plugin-promise": "^6.1.1"
+  }
+}
