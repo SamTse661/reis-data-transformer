@@ -1,8 +1,10 @@
-const fs = require('fs');
-const XLSX = require('xlsx');
 import { tableCodeMapping } from '../const/master-list';
+import { specialHandleForAppAssessment } from '../transformer/appAssessment';
+import { specialHandleForAppLm, specialHandleForAppLmt } from '../transformer/appLm';
 import { checkDropbox, createOutputDirectory } from '../utils/file';
 import { logger } from './logger';
+const fs = require('fs');
+const XLSX = require('xlsx');
 
 const processTimestamp = new Date().toISOString().replace(/[:.]/g, '-');
 const tableList = [];
@@ -54,11 +56,28 @@ const generateSQLInsert = (a) => {
   }
 };
 
+const combineAllSQLFiles = () => {
+  const sqlFiles = fs.readdirSync(`output/${processTimestamp}/SQL`);
+  let combinedSQL = '';
+  for (const file of sqlFiles) {
+    if (file.endsWith('_sql_insert.sql')) {
+      const filePath = `output/${processTimestamp}/SQL/${file}`;
+      const sqlContent = fs.readFileSync(filePath, 'utf8');
+      combinedSQL += sqlContent + '\n';
+    }
+  }
+  fs.writeFileSync(`output/${processTimestamp}/SQL/combined_sql_insert.sql`, combinedSQL, 'utf8');
+};
+
 export const processREIS = async () => {
   try {
-    excelToJSON();
-    processJSONData();
-    generateSQLInsert();
+    // excelToJSON();
+    // processJSONData();
+    // generateSQLInsert();
+    // combineAllSQLFiles();
+
+    // specialHandleForAppAssessment('int_080', '2025-07-06T15-41-59-468Z');
+    specialHandleForAppLm('int_001', '2025-07-06T15-41-59-468Z');
   } catch (error) {
     console.error(error);
   }

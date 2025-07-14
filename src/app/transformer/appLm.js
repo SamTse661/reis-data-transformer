@@ -27,13 +27,7 @@ const generateUUIDForData = (tableCode, data) => {
     row.original_id = row[idFiledName];
     row[idFiledName] = uuidv4();
     // Additional Fields Here
-    row.int_case_clerk_id = 'f1a17a03-7436-4ba6-83a0-0703496c3b04';
-    row.int_case_officer_id = 'aa302bb6-ae94-41a8-bf8f-6a548a8b2e07';
     row.int_file_record_type = 'R';
-    row.int_file_address_country = 'Hong Kong';
-    row.int_file_address_area = '5e0a658a-d334-11ef-b7ac-0242ac130002';
-    row.int_file_address_street = row.int_file_address_1;
-    row.int_file_address_building_no = row.int_file_address_2 ?? null;
 
     // Fields needed to be removed
     delete row.int_file_address_1;
@@ -53,4 +47,28 @@ export const appLmSqlGenerator = (tableCode, processTimestamp) => {
   let sql = `INSERT INTO ${tableCodeMapping[tableCode].name} (${columns.join(', ')}) VALUES \n${values.join(',\n')};\n`;
   sql = sql.replaceAll('undefined', 'NULL');
   fs.writeFileSync(`output/${processTimestamp}/SQL/${tableCode}_sql_insert.sql`, sql, 'utf8');
+
+  // Export as JSON List
+  for (const row of transformedData) {
+    delete row.original_id;
+    row.int_file_lm_no = row.int_file_lm_no ? row.int_file_lm_no.toString() : null;
+    row.int_file_dd = row.int_file_dd ? row.int_file_dd.toString() : null;
+    row.int_file_lot = row.int_file_lot ? row.int_file_lot.toString() : null;
+  }
+  fs.writeFileSync(`output/${processTimestamp}/Processed/${tableCode}_processed.json`, JSON.stringify(transformedData, null, 2), 'utf8');
+};
+
+export const specialHandleForAppLm = (tableCode, processTimestamp) => {
+  const transformedData = JSON.parse(fs.readFileSync(`output/${processTimestamp}/Processed/${tableCode}_processed.json`, { encoding: 'utf8', flag: 'r' }));
+
+  const plaintText = fs.readFileSync(`output/${processTimestamp}/PreProcessed/${tableCode}_pre.json`, { encoding: 'utf8', flag: 'r' });
+  const jsonData = JSON.parse(plaintText);
+  const data = jsonData.data;
+
+  const i = 0;
+
+  for (const row of transformedData) {
+    row.int_file_lot = data[i].int_file_lot ? data[i].int_file_lot.toString() : null;
+  }
+  fs.writeFileSync(`output/${processTimestamp}/Processed/${tableCode}_re_processed.json`, JSON.stringify(transformedData, null, 2), 'utf8');
 };

@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { tableCodeMapping } from '../const/master-list';
 const fs = require('fs');
 
-export const agIITransformer = (tableCode, processTimestamp) => {
+export const rentalTransformer = (tableCode, processTimestamp) => {
   let plaintText = fs.readFileSync(`output/${processTimestamp}/PreProcessed/${tableCode}_pre.json`, { encoding: 'utf8', flag: 'r' });
   plaintText = plaintText.replaceAll('45834.578148148146', '"2025-07-01 00:00:00"');
 
@@ -32,23 +32,22 @@ const generateUUIDForData = (tableCode, data, processTimestamp) => {
     // Fields needed to be removed
 
     // Get Mapping of int_app_id and int_file_id
-    row.original_applicant_id = row.int_applicant_id;
-    row.original_rr_application_id = row.int_rr_application_id;
+    row.original_assessment_id = row.int_assessment_id;
+    row.original_crv_memo_id = row.int_crv_memo_id;
+    row.int_event_timeline_id_rental = uuidv4();
 
-    row.int_applicant_id = lookupExternalTableTd('int_004', processTimestamp, row.int_applicant_id);
-    row.int_rr_application_id = lookupExternalTableTd('int_006', processTimestamp, row.int_rr_application_id);
+    row.int_assessment_id = lookupExternalTableTd('int_012', processTimestamp, row.int_assessment_id);
+    row.int_crv_memo_id = lookupExternalTableTd('int_011', processTimestamp, row.int_crv_memo_id);
 
     return row;
   });
 };
 
-export const agIISqlGenerator = (tableCode, processTimestamp) => {
+export const rentalSqlGenerator = (tableCode, processTimestamp) => {
   const transformedData = JSON.parse(fs.readFileSync(`output/${processTimestamp}/Processing/${tableCode}_transform.json`, { encoding: 'utf8', flag: 'r' })).data;
-  // Update here to remove old PK and FK
-
   delete transformedData[0].original_id;
-  delete transformedData[0].original_applicant_id;
-  delete transformedData[0].original_rr_application_id;
+  delete transformedData[0].original_assessment_id;
+  delete transformedData[0].original_crv_memo_id;
   const columns = Object.keys(transformedData[0]);
   const values = transformedData.map(row => {
     return `(${columns.map(col => `${typeof row[col] == 'string' ? `'${row[col]}'` : `${row[col]}`}`).join(', ')})`;
@@ -60,10 +59,8 @@ export const agIISqlGenerator = (tableCode, processTimestamp) => {
   // Export as JSON List
   for (const row of transformedData) {
     delete row.original_id;
-    delete row.original_applicant_id;
-    delete row.original_rr_application_id;
-    row.int_applicant_rr_sign_waived = row.int_applicant_rr_sign_waived ? row.int_applicant_rr_sign_waived.toString() : null;
-    row.int_app_ii_hkid_check_digit = row.int_app_ii_hkid_check_digit ? row.int_app_ii_hkid_check_digit.toString() : null;
+    delete row.original_assessment_id;
+    delete row.original_crv_memo_id;
   }
   fs.writeFileSync(`output/${processTimestamp}/Processed/${tableCode}_processed.json`, JSON.stringify(transformedData, null, 2), 'utf8');
 };

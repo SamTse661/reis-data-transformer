@@ -52,6 +52,13 @@ export const agCommSqlGenerator = (tableCode, processTimestamp) => {
   let sql = `INSERT INTO ${tableCodeMapping[tableCode].name} (${columns.join(', ')}) VALUES \n${values.join(',\n')};\n`;
   sql = sql.replaceAll('undefined', 'NULL');
   fs.writeFileSync(`output/${processTimestamp}/SQL/${tableCode}_sql_insert.sql`, sql, 'utf8');
+
+  // Export as JSON List
+  for (const row of transformedData) {
+    delete row.original_id;
+    delete row.original_ag_id;
+  }
+  fs.writeFileSync(`output/${processTimestamp}/Processed/${tableCode}_processed.json`, JSON.stringify(transformedData, null, 2), 'utf8');
 };
 
 export const lookupExternalTableTd = (tableCode, processTimestamp, targetId) => {

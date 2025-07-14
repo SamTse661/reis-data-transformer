@@ -42,4 +42,10 @@ export const createOutputDirectory = (processTimestamp) => {
     fs.mkdirSync(outputSQLDir, { recursive: true });
     logger.info(`SQL directory created: ${outputSQLDir}`);
   }
+
+  const outputProcessedDir = `${outputDir}/Processed`;
+  if (!fs.existsSync(outputProcessedDir)) {
+    fs.mkdirSync(outputProcessedDir, { recursive: true });
+    logger.info(`Processed directory created: ${outputProcessedDir}`);
+  }
 };

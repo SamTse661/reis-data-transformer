@@ -51,6 +51,17 @@ export const propertySqlGenerator = (tableCode, processTimestamp) => {
   let sql = `INSERT INTO ${tableCodeMapping[tableCode].name} (${columns.join(', ')}) VALUES \n${values.join(',\n')};\n`;
   sql = sql.replaceAll('undefined', 'NULL');
   fs.writeFileSync(`output/${processTimestamp}/SQL/${tableCode}_sql_insert.sql`, sql, 'utf8');
+
+  // Export as JSON List
+  for (const row of transformedData) {
+    delete row.original_id;
+    delete row.original_file_id;
+    row.int_property_dd = row.int_property_dd ? row.int_property_dd.toString() : null;
+    row.int_dva = row.int_dva == 1;
+    row.int_property_status = row.int_property_status ? row.int_property_status.toString() : null;
+    row.int_property_lot = row.int_property_lot ? row.int_property_lot.toString() : null;
+  }
+  fs.writeFileSync(`output/${processTimestamp}/Processed/${tableCode}_processed.json`, JSON.stringify(transformedData, null, 2), 'utf8');
 };
 
 export const lookupExternalTableTd = (tableCode, processTimestamp, targetId) => {
